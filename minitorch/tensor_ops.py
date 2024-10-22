@@ -40,17 +40,19 @@ class TensorOps:
     @staticmethod
     def reduce(
         fn: Callable[[float, float], float], start: float = 0.0
-    ) -> Callable[[Tensor, int], Tensor]: 
+    ) -> Callable[[Tensor, int], Tensor]:
         """Creates a reduction function that applies a given binary function
         to reduce a tensor along a specified dimension.
 
         Args:
-        fn (Callable[[float, float], float]): A binary function that takes two floats 
+        ----
+        fn (Callable[[float, float], float]): A binary function that takes two floats
             and returns a float. It defines how the reduction is performed.
         start (float, optional): The starting value for the reduction. Defaults to 0.0.
 
         Returns:
-        Callable[[Tensor, int], Tensor]: A function that reduces a given tensor along 
+        -------
+        Callable[[Tensor, int], Tensor]: A function that reduces a given tensor along
         the specified dimension using the provided binary function.
 
         """
@@ -70,10 +72,12 @@ class TensorBackend:
         that implements map, zip, and reduce higher-order functions.
 
         Args:
+        ----
             ops : tensor operations object see `tensor_ops.py`
 
 
         Returns:
+        -------
             A collection of tensor functions
 
         """
@@ -125,12 +129,14 @@ class SimpleOps(TensorOps):
                     out[i, j] = fn(a[i, 0])
 
         Args:
+        ----
             fn: function from float-to-float to apply.
             a (:class:`TensorData`): tensor to map over
             out (:class:`TensorData`): optional, tensor data to fill in,
                    should broadcast with `a`
 
         Returns:
+        -------
             new tensor data
 
         """
@@ -167,11 +173,13 @@ class SimpleOps(TensorOps):
 
 
         Args:
+        ----
             fn: function from two floats-to-float to apply
             a (:class:`TensorData`): tensor to zip over
             b (:class:`TensorData`): tensor to zip over
 
         Returns:
+        -------
             :class:`TensorData` : new tensor data
 
         """
@@ -196,13 +204,15 @@ class SimpleOps(TensorOps):
         to reduce a tensor along a specified dimension.
 
         Args:
-            fn (Callable[[float, float], float]): A binary function that takes two floats 
+        ----
+            fn (Callable[[float, float], float]): A binary function that takes two floats
                 and returns a float. It defines how the reduction is performed.
-            start (float, optional): The initial value to start the reduction from. 
+            start (float, optional): The initial value to start the reduction from.
                 Defaults to 0.0.
 
         Returns:
-            Callable[[Tensor, int], Tensor]: A function that reduces a given tensor along 
+        -------
+            Callable[[Tensor, int], Tensor]: A function that reduces a given tensor along
             the specified dimension using the provided binary function.
 
         """
@@ -251,9 +261,11 @@ def tensor_map(
       broadcast. (`in_shape` must be smaller than `out_shape`).
 
     Args:
+    ----
         fn: function from float-to-float to apply
 
     Returns:
+    -------
         Tensor map function.
 
     """
@@ -268,7 +280,7 @@ def tensor_map(
     ) -> None:
         """Apply `fn` to each element of `in_storage` and store the result in `out`."""
         # Calculate the size of the output tensor
-        out_size = int(np.prod(out_shape))
+        out_size = int(operators.prod(out_shape))
         # Initialize indices for input and output tensors
         in_index = np.zeros_like(in_shape)
         out_index = np.zeros_like(out_shape)
@@ -311,7 +323,7 @@ def tensor_zip(
     ) -> None:
         """Apply `fn` to elements of `a_storage` and `b_storage` and store results in `out`."""
         # Calculate the total number of elements in the output tensor
-        out_size = int(np.prod(out_shape))
+        out_size = int(operators.prod(out_shape))
 
         # Initialize indices for input and output tensors
         a_index = np.zeros_like(a_shape)
@@ -338,7 +350,6 @@ def tensor_zip(
     return _zip
 
 
-
 def tensor_reduce(
     fn: Callable[[float, float], float],
 ) -> Callable[[Storage, Shape, Strides, Storage, Shape, Strides, int], None]:
@@ -355,7 +366,7 @@ def tensor_reduce(
     ) -> None:
         """Apply reduction function along the specified dimension."""
         # Calculate the total number of elements in the output tensor
-        out_size = int(np.prod(out_shape))
+        out_size = int(operators.prod(out_shape))
 
         # Initialize indices for input and output tensors
         a_index = np.zeros_like(a_shape)

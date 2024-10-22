@@ -44,7 +44,8 @@ class History:
     """Stores the history of `Function` operations that were used to construct
     the current Variable.
 
-    Attributes:
+    Attributes
+    ----------
         last_fn (Optional[Type[Function]]): The last function applied to this variable.
         ctx (Optional[Context]): The context of the last function call.
         inputs (Sequence[Tensor]): The input tensors to the last function call.
@@ -62,7 +63,8 @@ _tensor_count = 0
 class Tensor:
     """A generalization of Scalar that handles multidimensional arrays.
 
-    Attributes:
+    Attributes
+    ----------
         backend (TensorBackend): The backend used for tensor operations.
         history (Optional[History]): The history of operations applied to the tensor.
         grad (Optional[Tensor]): The gradient of the tensor.
@@ -82,10 +84,11 @@ class Tensor:
         """Initializes the Tensor object.
 
         Args:
+        ----
             v (TensorData): The tensor data.
             back (Optional[History], optional): The history of operations. Defaults to None.
             name (Optional[str], optional): The name of the tensor. Defaults to None.
-            backend (Optional[TensorBackend], optional): The backend used for tensor operations. 
+            backend (Optional[TensorBackend], optional): The backend used for tensor operations.
                 Must be provided. Defaults to None.
 
         """
@@ -105,6 +108,7 @@ class Tensor:
         """Sets the tensor to require gradients.
 
         Args:
+        ----
             x (bool): Whether gradients are required.
 
         """
@@ -113,7 +117,8 @@ class Tensor:
     def requires_grad(self) -> bool:
         """Checks if the tensor requires gradients.
 
-        Returns:
+        Returns
+        -------
             bool: True if the tensor requires gradients, False otherwise.
 
         """
@@ -122,7 +127,8 @@ class Tensor:
     def to_numpy(self) -> npt.NDArray[np.float64]:
         """Converts the tensor to a numpy array.
 
-        Returns:
+        Returns
+        -------
             npt.NDArray[np.float64]: The tensor as a numpy array.
 
         """
@@ -132,9 +138,11 @@ class Tensor:
         """Converts a Python number into a tensor with the same backend.
 
         Args:
+        ----
             b (TensorLike): The input to be converted.
 
         Returns:
+        -------
             Tensor: The converted tensor.
 
         """
@@ -148,10 +156,12 @@ class Tensor:
     def item(self) -> float:
         """Converts a 1-element tensor to a float.
 
-        Returns:
+        Returns
+        -------
             float: The tensor value as a float.
 
-        Raises:
+        Raises
+        ------
             AssertionError: If the tensor size is not 1.
 
         """
@@ -162,7 +172,8 @@ class Tensor:
     def contiguous(self) -> Tensor:
         """Returns a contiguous tensor with the same data.
 
-        Returns:
+        Returns
+        -------
             Tensor: A contiguous tensor.
 
         """
@@ -171,7 +182,8 @@ class Tensor:
     def __repr__(self) -> str:
         """Returns a string representation of the tensor.
 
-        Returns:
+        Returns
+        -------
             str: The string representation of the tensor.
 
         """
@@ -181,9 +193,11 @@ class Tensor:
         """Gets the value at the specified index.
 
         Args:
+        ----
             key (Union[int, UserIndex]): The index to access.
 
         Returns:
+        -------
             float: The value at the specified index.
 
         """
@@ -194,6 +208,7 @@ class Tensor:
         """Sets the value at the specified index.
 
         Args:
+        ----
             key (Union[int, UserIndex]): The index to modify.
             val (float): The value to set.
 
@@ -205,6 +220,7 @@ class Tensor:
         """Sets the backend of the tensor.
 
         Args:
+        ----
             backend (TensorBackend): The new backend.
 
         """
@@ -216,9 +232,11 @@ class Tensor:
         """Creates a new tensor with the given data.
 
         Args:
+        ----
             tensor_data (TensorData): The tensor data.
 
         Returns:
+        -------
             Tensor: The new tensor.
 
         """
@@ -234,13 +252,15 @@ class Tensor:
         """Creates a new tensor from data.
 
         Args:
+        ----
             storage (Union[Storage, List[float]]): The storage for the tensor.
             shape (UserShape): The shape of the tensor.
             strides (Optional[UserStrides], optional): The strides of the tensor. Defaults to None.
-            backend (Optional[TensorBackend], optional): The backend used for tensor operations. 
+            backend (Optional[TensorBackend], optional): The backend used for tensor operations.
                 Defaults to None.
 
         Returns:
+        -------
             Tensor: The new tensor.
 
         """
@@ -250,9 +270,11 @@ class Tensor:
         """Expands the tensor for backprop over broadcasting.
 
         Args:
+        ----
             other (Tensor): The backward tensor (must broadcast with self).
 
         Returns:
+        -------
             Tensor: The expanded version of `other` with the right derivatives.
 
         """
@@ -280,13 +302,16 @@ class Tensor:
         """Creates a tensor filled with zeros.
 
         Args:
-            shape (Optional[UserShape], optional): The shape of the tensor. 
+        ----
+            shape (Optional[UserShape], optional): The shape of the tensor.
                 If None, the shape of the current tensor is used. Defaults to None.
 
         Returns:
+        -------
             Tensor: The tensor filled with zeros.
 
         """
+
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
                 [0.0] * int(operators.prod(shape)), shape, backend=self.backend
@@ -302,7 +327,8 @@ class Tensor:
     def tuple(self) -> Tuple[Storage, Shape, Strides]:
         """Gets the tensor data info as a tuple.
 
-        Returns:
+        Returns
+        -------
             Tuple[Storage, Shape, Strides]: The tensor data tuple.
 
         """
@@ -311,7 +337,8 @@ class Tensor:
     def detach(self) -> Tensor:
         """Detaches the tensor from backpropagation.
 
-        Returns:
+        Returns
+        -------
             Tensor: The detached tensor.
 
         """
@@ -322,9 +349,11 @@ class Tensor:
         Should only be called during autodifferentiation on leaf variables.
 
         Args:
+        ----
             x (Any): The value to be accumulated.
 
         Raises:
+        ------
             AssertionError: If the variable is not a leaf.
 
         """
@@ -340,7 +369,8 @@ class Tensor:
     def is_leaf(self) -> bool:
         """Checks if this variable is a leaf.
 
-        Returns:
+        Returns
+        -------
             bool: True if this is a leaf variable, False otherwise.
 
         """
@@ -349,7 +379,8 @@ class Tensor:
     def is_constant(self) -> bool:
         """Checks if the tensor is constant.
 
-        Returns:
+        Returns
+        -------
             bool: True if the tensor is constant, False otherwise.
 
         """
@@ -359,7 +390,8 @@ class Tensor:
     def parents(self) -> Iterable[Variable]:
         """Gets the parent variables.
 
-        Returns:
+        Returns
+        -------
             Iterable[Variable]: The parent variables.
 
         """
@@ -370,9 +402,11 @@ class Tensor:
         """Applies the chain rule for backpropagation.
 
         Args:
+        ----
             d_output (Any): The gradient of the output.
 
         Returns:
+        -------
             Iterable[Tuple[Variable, Any]]: The gradients of the inputs.
 
         """
@@ -393,7 +427,8 @@ class Tensor:
         """Performs backpropagation on the tensor.
 
         Args:
-            grad_output (Optional[Tensor], optional): The gradient of the output. 
+        ----
+            grad_output (Optional[Tensor], optional): The gradient of the output.
                 If None, a gradient of 1 is assumed for scalars. Defaults to None.
 
         """
@@ -406,9 +441,11 @@ class Tensor:
         """Element-wise division of the tensor.
 
         Args:
+        ----
             b (TensorLike): The divisor.
 
         Returns:
+        -------
             Tensor: The result of division.
 
         """
@@ -418,9 +455,11 @@ class Tensor:
         """Element-wise division, with the tensor as the divisor.
 
         Args:
+        ----
             b (TensorLike): The dividend.
 
         Returns:
+        -------
             Tensor: The result of division.
 
         """
@@ -430,9 +469,11 @@ class Tensor:
         """Performs matrix multiplication with another tensor.
 
         Args:
+        ----
             b (Tensor): The tensor to multiply with.
 
         Returns:
+        -------
             Tensor: The result of matrix multiplication.
 
         """
@@ -442,7 +483,8 @@ class Tensor:
     def shape(self) -> UserShape:
         """Gets the shape of the tensor.
 
-        Returns:
+        Returns
+        -------
             UserShape: The shape of the tensor.
 
         """
@@ -452,9 +494,11 @@ class Tensor:
         """Element-wise addition of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to add.
 
         Returns:
+        -------
             Tensor: The sum of the tensors.
 
         """
@@ -465,9 +509,11 @@ class Tensor:
         """Right-side element-wise addition of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to add.
 
         Returns:
+        -------
             Tensor: The sum of the tensors.
 
         """
@@ -477,9 +523,11 @@ class Tensor:
         """Element-wise subtraction of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to subtract.
 
         Returns:
+        -------
             Tensor: The result of subtraction.
 
         """
@@ -490,9 +538,11 @@ class Tensor:
         """Right-side element-wise subtraction of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to subtract from.
 
         Returns:
+        -------
             Tensor: The result of subtraction.
 
         """
@@ -502,9 +552,11 @@ class Tensor:
         """Element-wise multiplication of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to multiply.
 
         Returns:
+        -------
             Tensor: The product of the tensors.
 
         """
@@ -515,9 +567,11 @@ class Tensor:
         """Right-side element-wise multiplication of tensors.
 
         Args:
+        ----
             other (TensorLike): The tensor to multiply.
 
         Returns:
+        -------
             Tensor: The product of the tensors.
 
         """
@@ -526,7 +580,8 @@ class Tensor:
     def __neg__(self) -> Tensor:
         """Negates the tensor.
 
-        Returns:
+        Returns
+        -------
             Tensor: The negated tensor.
 
         """
@@ -536,9 +591,11 @@ class Tensor:
         """Element-wise greater-than comparison.
 
         Args:
+        ----
             other (TensorLike): The tensor to compare with.
 
         Returns:
+        -------
             Tensor: The result of the comparison.
 
         """
@@ -549,9 +606,11 @@ class Tensor:
         """Element-wise less-than comparison.
 
         Args:
+        ----
             other (TensorLike): The tensor to compare with.
 
         Returns:
+        -------
             Tensor: The result of the comparison.
 
         """
@@ -562,9 +621,11 @@ class Tensor:
         """Element-wise equality comparison.
 
         Args:
+        ----
             other (TensorLike): The tensor to compare with.
 
         Returns:
+        -------
             Tensor: The result of the comparison.
 
         """
@@ -573,7 +634,8 @@ class Tensor:
     def relu(self) -> Tensor:
         """Applies the ReLU function element-wise.
 
-        Returns:
+        Returns
+        -------
             Tensor: The result after applying ReLU.
 
         """
@@ -582,7 +644,8 @@ class Tensor:
     def sigmoid(self) -> Tensor:
         """Applies the Sigmoid function element-wise.
 
-        Returns:
+        Returns
+        -------
             Tensor: The result after applying Sigmoid.
 
         """
@@ -591,7 +654,8 @@ class Tensor:
     def exp(self) -> Tensor:
         """Computes the element-wise exponential of the tensor.
 
-        Returns:
+        Returns
+        -------
             Tensor: The result of the exponential operation.
 
         """
@@ -601,10 +665,12 @@ class Tensor:
         """Checks if the tensor is element-wise close to another tensor.
 
         Args:
+        ----
             other (TensorLike): The tensor to compare with.
             tol (float, optional): The tolerance for closeness. Defaults to 1e-5.
 
         Returns:
+        -------
             Tensor: A tensor indicating element-wise closeness.
 
         """
@@ -615,7 +681,8 @@ class Tensor:
     def log(self) -> Tensor:
         """Computes the element-wise natural logarithm of the tensor.
 
-        Returns:
+        Returns
+        -------
             Tensor: The result of the logarithm operation.
 
         """
@@ -624,7 +691,8 @@ class Tensor:
     def neg(self) -> Tensor:
         """Negates the tensor element-wise.
 
-        Returns:
+        Returns
+        -------
             Tensor: The negated tensor.
 
         """
@@ -634,10 +702,12 @@ class Tensor:
         """Sums the tensor along a specified dimension.
 
         Args:
-            dim (Optional[int], optional): The dimension to sum over. 
+        ----
+            dim (Optional[int], optional): The dimension to sum over.
                 If None, sums over all dimensions. Defaults to None.
 
         Returns:
+        -------
             Tensor: The summed tensor.
 
         """
@@ -656,10 +726,12 @@ class Tensor:
         """Computes the mean of the tensor along a specified dimension.
 
         Args:
-            dim (Optional[int], optional): The dimension to average over. 
+        ----
+            dim (Optional[int], optional): The dimension to average over.
                 If None, averages over all dimensions. Defaults to None.
 
         Returns:
+        -------
             Tensor: The mean of the tensor.
 
         """
@@ -671,10 +743,12 @@ class Tensor:
         """Checks if all elements of the tensor are True along a specified dimension.
 
         Args:
-            dim (Optional[int], optional): The dimension to check. 
+        ----
+            dim (Optional[int], optional): The dimension to check.
                 If None, checks all elements. Defaults to None.
 
         Returns:
+        -------
             Tensor: A tensor indicating if all elements are True.
 
         """
@@ -686,26 +760,55 @@ class Tensor:
         """Permutes the dimensions of the tensor.
 
         Args:
+        ----
             order (Union[int, Tuple[int, ...]]): The new order of dimensions.
 
         Returns:
+        -------
             Tensor: The permuted tensor.
 
         """
+        # If a single tuple or list is provided, unpack it
         if len(order) == 1 and isinstance(order[0], (tuple, list)):
             order = order[0]
-        return Permute.apply(self, Tensor.make(list(order), (len(order),), backend=self.backend))
+
+        # Initialize an empty list to store the flattened order
+        flat_order: List[float] = []
+
+        # Iterate through each item in order
+        for item in order:
+            if isinstance(item, int):
+                # Convert integer to float and append
+                flat_order.append(float(item))
+            elif isinstance(item, tuple):
+                # Iterate through the tuple and convert each integer to float
+                for dim in item:
+                    if not isinstance(dim, int):
+                        raise TypeError("All permutation indices must be integers.")
+                    flat_order.append(float(dim))
+            else:
+                # Raise an error if the item is neither int nor tuple
+                raise TypeError("Order must be an integer or a tuple of integers.")
+
+        # Create a Tensor representing the permutation order
+        order_tensor = Tensor.make(flat_order, (len(flat_order),), backend=self.backend)
+
+        # Apply the permutation using the Permute function
+        return Permute.apply(self, order_tensor)
 
     def view(self, *shape: Union[int, Tuple[int, ...]]) -> Tensor:
         """Reshapes the tensor to the specified shape.
 
         Args:
+        ----
             shape (Union[int, Tuple[int, ...]]): The new shape.
 
         Returns:
+        -------
             Tensor: The reshaped tensor.
 
         Raises:
+        ------
             ValueError: If the total number of elements changes.
             TypeError: If non-integer dimensions are provided.
 
@@ -720,15 +823,19 @@ class Tensor:
             elif isinstance(dim, tuple):
                 flat_shape.extend(dim)
             else:
-                raise TypeError("All dimensions must be integers or tuples of integers.")
+                raise TypeError(
+                    "All dimensions must be integers or tuples of integers."
+                )
 
         flat_shape = tuple(flat_shape)
 
-        if np.prod(flat_shape) != self.size:
+        if operators.prod(flat_shape) != self.size:
             raise ValueError("Total number of elements must remain unchanged.")
 
         shape_storage = [float(dim) for dim in flat_shape]
-        shape_tensor = Tensor.make(shape_storage, (len(flat_shape),), backend=self.backend)
+        shape_tensor = Tensor.make(
+            shape_storage, (len(flat_shape),), backend=self.backend
+        )
         return View.apply(self, shape_tensor)
 
     def zero_grad_(self) -> None:
@@ -739,8 +846,9 @@ class Tensor:
     def size(self) -> int:
         """Gets the total number of elements in the tensor.
 
-        Returns:
+        Returns
+        -------
             int: The total number of elements.
 
         """
-        return int(np.prod(self.shape))
+        return int(operators.prod(self.shape))

@@ -19,9 +19,11 @@ def wrap_tuple(x: Any) -> tuple:
     """Converts a value into a tuple if it is not already a tuple.
 
     Args:
+    ----
         x (Any): The input value.
 
     Returns:
+    -------
         tuple: The input value wrapped in a tuple.
 
     """
@@ -33,7 +35,8 @@ def wrap_tuple(x: Any) -> tuple:
 class Function:
     """Base class for all functions that can be used in autodifferentiation.
 
-    Methods:
+    Methods
+    -------
         apply: Applies the function to input tensors and tracks history.
         _forward: Internal forward pass method.
         _backward: Internal backward pass method.
@@ -45,37 +48,43 @@ class Function:
         """Internal method to perform the backward pass.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_out (Tensor): The gradient output from the previous layer.
 
         Returns:
+        -------
             Tuple[Tensor, ...]: Gradients with respect to the input tensors.
 
         """
-        return wrap_tuple(cls.backward(ctx, grad_out))
+        return wrap_tuple(cls.backward(ctx, grad_out))  # type: ignore
 
     @classmethod
     def _forward(cls, ctx: Context, *inps: Tensor) -> Tensor:
         """Internal method to perform the forward pass.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             inps (Tensor): The input tensors.
 
         Returns:
+        -------
             Tensor: The result of the forward pass.
 
         """
-        return cls.forward(ctx, *inps)
+        return cls.forward(ctx, *inps)  # type: ignore
 
     @classmethod
     def apply(cls, *vals: Tensor) -> Tensor:
         """Applies the function to input tensors and tracks history for gradients.
 
         Args:
+        ----
             vals (Tensor): The input tensors.
 
         Returns:
+        -------
             Tensor: The result of the function application.
 
         """
@@ -112,10 +121,12 @@ class Neg(Function):
         """Forward pass for negation.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The negated tensor.
 
         """
@@ -126,10 +137,12 @@ class Neg(Function):
         """Backward pass for negation.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -144,10 +157,12 @@ class Inv(Function):
         """Forward pass for inversion.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The inverted tensor.
 
         """
@@ -159,10 +174,12 @@ class Inv(Function):
         """Backward pass for inversion.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -178,11 +195,13 @@ class Add(Function):
         """Forward pass for addition.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
 
         Returns:
+        -------
             Tensor: The sum of the input tensors.
 
         """
@@ -193,10 +212,12 @@ class Add(Function):
         """Backward pass for addition.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: The gradients with respect to the input tensors.
 
         """
@@ -211,18 +232,22 @@ class All(Function):
         """Forward pass for checking if all elements are true.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             a (Tensor): The input tensor.
             dim (Tensor): The dimension to reduce along.
 
         Returns:
+        -------
             Tensor: 1 if all elements are true, else 0.
 
         """
         if dim is not None:
             result = a.f.mul_reduce(a, int(dim.item()))
         else:
-            result = a.f.mul_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
+            result = a.f.mul_reduce(
+                a.contiguous().view(int(operators.prod(a.shape))), 0
+            )
 
         if result.size > 1:
             return result.f.mul_reduce(result.contiguous().view(result.size), 0)
@@ -237,11 +262,13 @@ class Mul(Function):
         """Forward pass for multiplication.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
 
         Returns:
+        -------
             Tensor: The product of the input tensors.
 
         """
@@ -253,10 +280,12 @@ class Mul(Function):
         """Backward pass for multiplication.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: The gradients with respect to the input tensors.
 
         """
@@ -274,10 +303,12 @@ class Sigmoid(Function):
         """Forward pass for the sigmoid function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The result after applying the sigmoid function.
 
         """
@@ -290,10 +321,12 @@ class Sigmoid(Function):
         """Backward pass for the sigmoid function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -309,10 +342,12 @@ class ReLU(Function):
         """Forward pass for the ReLU function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The result after applying the ReLU function.
 
         """
@@ -324,10 +359,12 @@ class ReLU(Function):
         """Backward pass for the ReLU function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -343,10 +380,12 @@ class Log(Function):
         """Forward pass for the logarithm function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The result after applying the logarithm function.
 
         """
@@ -358,10 +397,12 @@ class Log(Function):
         """Backward pass for the logarithm function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -378,10 +419,12 @@ class Exp(Function):
         """Forward pass for the exponential function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: The result after applying the exponential function.
 
         """
@@ -394,10 +437,12 @@ class Exp(Function):
         """Backward pass for the exponential function.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -414,11 +459,13 @@ class Sum(Function):
         """Forward pass for summing elements along a specified dimension.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             a (Tensor): The input tensor.
             dim (Tensor): The dimension to sum along.
 
         Returns:
+        -------
             Tensor: The summed tensor.
 
         """
@@ -430,10 +477,12 @@ class Sum(Function):
         """Backward pass for the sum operation.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, float]: The gradient with respect to the input tensor.
 
         """
@@ -449,11 +498,13 @@ class LT(Function):
         """Forward pass for less-than comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
 
         Returns:
+        -------
             Tensor: The result of the comparison.
 
         """
@@ -464,10 +515,12 @@ class LT(Function):
         """Backward pass for less-than comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: Zero gradients for the input tensors.
 
         """
@@ -482,11 +535,13 @@ class EQ(Function):
         """Forward pass for equality comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
 
         Returns:
+        -------
             Tensor: The result of the comparison.
 
         """
@@ -497,10 +552,12 @@ class EQ(Function):
         """Backward pass for equality comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: Zero gradients for the input tensors.
 
         """
@@ -515,12 +572,14 @@ class IsClose(Function):
         """Forward pass for closeness comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
             tol (float, optional): The tolerance for closeness. Defaults to 1e-5.
 
         Returns:
+        -------
             Tensor: The result of the closeness comparison.
 
         """
@@ -531,10 +590,12 @@ class IsClose(Function):
         """Backward pass for closeness comparison.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: Zero gradients for the input tensors.
 
         """
@@ -549,11 +610,13 @@ class Permute(Function):
         """Forward pass for permuting tensor dimensions.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The input tensor.
             order (Tensor): The new order of dimensions.
 
         Returns:
+        -------
             Tensor: The permuted tensor.
 
         """
@@ -567,10 +630,12 @@ class Permute(Function):
         """Backward pass for permutation.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, float]: The gradient with respect to the input tensor.
 
         """
@@ -588,29 +653,37 @@ class View(Function):
         """Forward pass for reshaping the tensor.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             a (Tensor): The input tensor.
             shape (Tensor): The new shape.
 
         Returns:
+        -------
             Tensor: The reshaped tensor.
 
         """
         ctx.save_for_backward(a.shape)
         assert a._tensor.is_contiguous(), "Tensor must be contiguous to view."
         shape2 = [int(shape[i]) for i in range(shape.size)]
-        assert np.prod(shape2) == a.size, "Total number of elements must remain unchanged."
-        return minitorch.Tensor.make(a._tensor._storage, tuple(shape2), backend=a.backend)
+        assert (
+            operators.prod(shape2) == a.size
+        ), "Total number of elements must remain unchanged."
+        return minitorch.Tensor.make(
+            a._tensor._storage, tuple(shape2), backend=a.backend
+        )
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         """Backward pass for reshaping.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, float]: The gradient with respect to the input tensor.
 
         """
@@ -627,10 +700,12 @@ class Copy(Function):
         """Forward pass for creating a contiguous copy.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             a (Tensor): The input tensor.
 
         Returns:
+        -------
             Tensor: A contiguous copy of the input tensor.
 
         """
@@ -641,10 +716,12 @@ class Copy(Function):
         """Backward pass for the identity operation.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tensor: The gradient with respect to the input tensor.
 
         """
@@ -659,11 +736,13 @@ class MatMul(Function):
         """Forward pass for matrix multiplication.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             t1 (Tensor): The first input tensor.
             t2 (Tensor): The second input tensor.
 
         Returns:
+        -------
             Tensor: The result of matrix multiplication.
 
         """
@@ -675,10 +754,12 @@ class MatMul(Function):
         """Backward pass for matrix multiplication.
 
         Args:
+        ----
             ctx (Context): The context for saved values.
             grad_output (Tensor): The gradient output from the next layer.
 
         Returns:
+        -------
             Tuple[Tensor, Tensor]: The gradients with respect to the input tensors.
 
         """
@@ -687,13 +768,15 @@ class MatMul(Function):
             """Transposes a matrix.
 
             Args:
+            ----
                 a (Tensor): The input matrix.
 
             Returns:
+            -------
                 Tensor: The transposed matrix.
 
             """
-            order = list(range(a.dims))
+            order = list(range(len(a.shape)))
             order[-2], order[-1] = order[-1], order[-2]
             return a._new(a._tensor.permute(*order))
 
@@ -708,15 +791,19 @@ def zeros(shape: UserShape, backend: TensorBackend = SimpleBackend) -> Tensor:
     """Produces a zero tensor of the specified shape.
 
     Args:
+    ----
         shape (UserShape): The shape of the tensor.
         backend (TensorBackend, optional): The tensor backend to use. Defaults to SimpleBackend.
 
     Returns:
+    -------
         Tensor: A tensor filled with zeros.
 
     """
     return minitorch.Tensor.make(
-        [0.0] * int(operators.prod(shape)), shape, backend=backend
+        [0.0] * int(operators.prod([float(d) for d in shape])),
+        tuple(shape),
+        backend=backend,
     )
 
 
@@ -728,15 +815,19 @@ def rand(
     """Produces a random tensor of the specified shape.
 
     Args:
+    ----
         shape (UserShape): The shape of the tensor.
         backend (TensorBackend, optional): The tensor backend to use. Defaults to SimpleBackend.
         requires_grad (bool, optional): Whether to enable gradient tracking. Defaults to False.
 
     Returns:
+    -------
         Tensor: A random tensor.
 
     """
-    vals = [random.random() for _ in range(int(operators.prod(shape)))]
+    vals = [
+        random.random() for _ in range(int(operators.prod([float(d) for d in shape])))
+    ]
     tensor = minitorch.Tensor.make(vals, shape, backend=backend)
     tensor.requires_grad_(requires_grad)
     return tensor
@@ -751,12 +842,14 @@ def _tensor(
     """Produces a tensor with the specified data and shape.
 
     Args:
+    ----
         ls (Any): The data for the tensor.
         shape (UserShape): The shape of the tensor.
         backend (TensorBackend, optional): The tensor backend to use. Defaults to SimpleBackend.
         requires_grad (bool, optional): Whether to enable gradient tracking. Defaults to False.
 
     Returns:
+    -------
         Tensor: The created tensor.
 
     """
@@ -771,11 +864,13 @@ def tensor(
     """Produces a tensor with data and shape derived from the input.
 
     Args:
+    ----
         ls (Any): The data for the tensor.
         backend (TensorBackend, optional): The tensor backend to use. Defaults to SimpleBackend.
         requires_grad (bool, optional): Whether to enable gradient tracking. Defaults to False.
 
     Returns:
+    -------
         Tensor: The created tensor.
 
     """
@@ -803,6 +898,7 @@ def grad_central_difference(
     """Computes the gradient using central difference approximation.
 
     Args:
+    ----
         f (Any): The function to differentiate.
         vals (Tensor): The input tensors.
         arg (int, optional): The argument index to differentiate. Defaults to 0.
@@ -810,6 +906,7 @@ def grad_central_difference(
         ind (UserIndex): The index to sample.
 
     Returns:
+    -------
         float: The approximated gradient.
 
     """
@@ -827,10 +924,12 @@ def grad_check(f: Any, *vals: Tensor) -> None:
     """Checks whether the autodiff gradient matches the central difference approximation.
 
     Args:
+    ----
         f (Any): The function to differentiate.
         vals (Tensor): The input tensors.
 
     Raises:
+    ------
         AssertionError: If the gradients do not match within the tolerance.
 
     """

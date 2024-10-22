@@ -2,10 +2,12 @@ from typing import Sequence
 from .module import Parameter
 from .scalar import Scalar
 
+
 class Optimizer:
     """Base class for all optimizers.
 
-    Attributes:
+    Attributes
+    ----------
         parameters (Sequence[Parameter]): A sequence of parameters to be optimized.
 
     """
@@ -14,6 +16,7 @@ class Optimizer:
         """Initializes the optimizer with a sequence of parameters.
 
         Args:
+        ----
             parameters (Sequence[Parameter]): The parameters that need to be optimized.
 
         """
@@ -23,7 +26,8 @@ class Optimizer:
 class SGD(Optimizer):
     """Stochastic Gradient Descent (SGD) optimizer.
 
-    Attributes:
+    Attributes
+    ----------
         parameters (Sequence[Parameter]): A sequence of parameters to be optimized.
         lr (float): Learning rate for the optimizer.
 
@@ -33,6 +37,7 @@ class SGD(Optimizer):
         """Initializes the SGD optimizer with parameters and learning rate.
 
         Args:
+        ----
             parameters (Sequence[Parameter]): The parameters that need to be optimized.
             lr (float, optional): Learning rate for the optimizer. Defaults to 1.0.
 
@@ -42,7 +47,7 @@ class SGD(Optimizer):
 
     def zero_grad(self) -> None:
         """Sets the gradients of all parameters to zero.
-        
+
         If the parameter has attributes 'derivative' or 'grad', this method will
         reset them to None.
         """

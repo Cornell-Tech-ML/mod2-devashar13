@@ -1,6 +1,6 @@
 """MiniTorch: A minimal implementation of a tensor library with autodifferentiation.
 
-This package provides core components to build and manipulate tensors, 
+This package provides core components to build and manipulate tensors,
 including operations for arithmetic, broadcasting, and autodifferentiation.
 """
 

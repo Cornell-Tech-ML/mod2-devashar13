@@ -8,7 +8,7 @@ import numpy.typing as npt
 from numpy import array, float64
 from typing_extensions import TypeAlias
 
-from .operators import prod
+from . import operators
 
 MAX_DIMS = 32
 
@@ -36,10 +36,12 @@ def index_to_position(index: Index, strides: Strides) -> int:
     storage based on strides.
 
     Args:
+    ----
         index (Index): The index tuple of ints representing the multidimensional index.
         strides (Strides): The tensor strides.
 
     Returns:
+    -------
         int: Position in storage.
 
     """
@@ -53,6 +55,7 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     """Converts an `ordinal` to an index in the `shape`.
 
     Args:
+    ----
         ordinal (int): The ordinal position to convert.
         shape (Shape): The tensor shape.
         out_index (OutIndex): The output index corresponding to position.
@@ -70,6 +73,7 @@ def broadcast_index(
     following broadcasting rules.
 
     Args:
+    ----
         big_index (Index): The multidimensional index of the bigger tensor.
         big_shape (Shape): The shape of the bigger tensor.
         shape (Shape): The shape of the smaller tensor.
@@ -88,13 +92,16 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """Broadcasts two shapes to create a new union shape.
 
     Args:
+    ----
         shape1 (UserShape): The first shape.
         shape2 (UserShape): The second shape.
 
     Returns:
+    -------
         UserShape: The broadcasted shape.
 
     Raises:
+    ------
         IndexingError: If the shapes cannot be broadcast together.
 
     """
@@ -113,7 +120,9 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         elif dim2 == 1:
             broadcast_shape.append(dim1)
         else:
-            raise IndexingError(f"Shapes {shape1} and {shape2} cannot be broadcast together")
+            raise IndexingError(
+                f"Shapes {shape1} and {shape2} cannot be broadcast together"
+            )
 
     return tuple(broadcast_shape)
 
@@ -122,9 +131,11 @@ def strides_from_shape(shape: UserShape) -> UserStrides:
     """Returns a contiguous stride for a given shape.
 
     Args:
+    ----
         shape (UserShape): The shape of the tensor.
 
     Returns:
+    -------
         UserStrides: The computed strides for the given shape.
 
     """
@@ -139,7 +150,8 @@ def strides_from_shape(shape: UserShape) -> UserStrides:
 class TensorData:
     """Manages tensor data, including storage, shape, and strides.
 
-    Attributes:
+    Attributes
+    ----------
         _storage (Storage): The underlying storage for the tensor.
         _strides (Strides): The strides of the tensor.
         _shape (Shape): The shape of the tensor.
@@ -165,11 +177,13 @@ class TensorData:
         """Initializes the TensorData object.
 
         Args:
+        ----
             storage (Union[Sequence[float], Storage]): The tensor storage.
             shape (UserShape): The shape of the tensor.
             strides (Optional[UserStrides], optional): The strides of the tensor. Defaults to None.
 
         Raises:
+        ------
             IndexingError: If the strides do not match the shape.
 
         """
@@ -189,7 +203,7 @@ class TensorData:
         self._shape = array(shape)
         self.strides = strides
         self.dims = len(strides)
-        self.size = int(prod(shape))
+        self.size = int(operators.prod(shape))
         self.shape = shape
         assert len(self._storage) == self.size
 
@@ -205,7 +219,8 @@ class TensorData:
         """Checks if the layout is contiguous, i.e., outer dimensions have bigger
         strides than inner dimensions.
 
-        Returns:
+        Returns
+        -------
             bool: True if the tensor is contiguous, False otherwise.
 
         """
@@ -221,10 +236,12 @@ class TensorData:
         """Computes the broadcasted shape of two shapes.
 
         Args:
+        ----
             shape_a (UserShape): The first shape.
             shape_b (UserShape): The second shape.
 
         Returns:
+        -------
             UserShape: The broadcasted shape.
 
         """
@@ -234,12 +251,15 @@ class TensorData:
         """Converts a multidimensional index to a single-dimensional storage index.
 
         Args:
+        ----
             index (Union[int, UserIndex]): The input index.
 
         Returns:
+        -------
             int: The single-dimensional index in storage.
 
         Raises:
+        ------
             IndexingError: If the index is out of bounds or has negative values.
 
         """
@@ -265,7 +285,8 @@ class TensorData:
     def indices(self) -> Iterable[UserIndex]:
         """Generates all possible indices for the tensor.
 
-        Yields:
+        Yields
+        ------
             UserIndex: The next index in the tensor.
 
         """
@@ -278,7 +299,8 @@ class TensorData:
     def sample(self) -> UserIndex:
         """Generates a random valid index within the tensor.
 
-        Returns:
+        Returns
+        -------
             UserIndex: A random index within the tensor.
 
         """
@@ -288,9 +310,11 @@ class TensorData:
         """Retrieves the value at the specified index.
 
         Args:
+        ----
             key (UserIndex): The index to access.
 
         Returns:
+        -------
             float: The value at the specified index.
 
         """
@@ -301,6 +325,7 @@ class TensorData:
         """Sets the value at the specified index.
 
         Args:
+        ----
             key (UserIndex): The index to modify.
             val (float): The value to set.
 
@@ -310,7 +335,8 @@ class TensorData:
     def tuple(self) -> Tuple[Storage, Shape, Strides]:
         """Returns the core tensor data as a tuple.
 
-        Returns:
+        Returns
+        -------
             Tuple[Storage, Shape, Strides]: The tensor's storage, shape, and strides.
 
         """
@@ -320,12 +346,15 @@ class TensorData:
         """Permutes the dimensions of the tensor.
 
         Args:
+        ----
             *order (int): The new order of dimensions.
 
         Returns:
+        -------
             TensorData: A new `TensorData` object with permuted dimensions.
 
         Raises:
+        ------
             AssertionError: If the order does not match the dimensions.
 
         """
@@ -340,7 +369,8 @@ class TensorData:
     def to_string(self) -> str:
         """Converts the tensor to a formatted string.
 
-        Returns:
+        Returns
+        -------
             str: The string representation of the tensor.
 
         """
