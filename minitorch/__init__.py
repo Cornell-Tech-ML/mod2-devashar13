@@ -1,3 +1,9 @@
+"""MiniTorch: A minimal implementation of a tensor library with autodifferentiation.
+
+This package provides core components to build and manipulate tensors,
+including operations for arithmetic, broadcasting, and autodifferentiation.
+"""
+
 from .testing import MathTest, MathTestVariable  # type: ignore # noqa: F401,F403
 from .tensor_data import *  # noqa: F401,F403
 from .tensor import *  # noqa: F401,F403
